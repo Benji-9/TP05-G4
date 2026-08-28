@@ -17,16 +17,17 @@ Seguir `TP05_Desarrollo_de_Aplicaciones_II/INSTALACION.md` (Python 3.10+ y
 
 ### 2. Levantar el simulador + backend
 
-```bash
-cd TP05_Desarrollo_de_Aplicaciones_II
-./INICIAR_TP05.sh      # Windows: INICIAR_TP05.bat
-```
-
-Va a preguntar qué robot usar (1 = G1, 2 = Go2) y mostrar la dirección del backend, por ejemplo:
-TU DASHBOARD tiene que pegarle a:
-http://10.0.0.5:8001
-
+# Opción 1: Doble clic en INICIAR_TP05.bat (elige robot interactivamente)
 **Dejar esa ventana abierta.**
+
+# Opción 2: Manual (dos terminales)
+# Terminal 1 - Simulador:
+cd TP05_Desarrollo_de_Aplicaciones_II/entorno
+python -m sim --robot g1 --materia tp05
+
+# Terminal 2 - Backend API:
+cd TP05_Desarrollo_de_Aplicaciones_II
+python entorno/arrancar_api.py --robot g1
 
 ### 3. Abrir el dashboard
 
