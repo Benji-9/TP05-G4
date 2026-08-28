@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Dashboard de telemetría en tiempo real para robots Unitree G1/Go2 — TP05 UADE">
+  <title>TP05 — Telemetría Robótica</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+
+  <!-- Dashboard Styles -->
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════ -->
+  <header class="header">
+    <div class="header__brand">
+      <span class="header__logo">Unitree Telemetry</span>
+      <span class="header__robot-name" id="robot-name">—</span>
+      <span class="header__robot-name" id="robot-mode" style="opacity:0.5">—</span>
+    </div>
+
+    <div class="header__controls">
+      <div class="connection">
+        <span class="connection__dot" id="connection-dot"></span>
+        <span id="connection-label">Desconectado</span>
+      </div>
+
+      <div class="url-input">
+        <input
+          type="text"
+          class="url-input__field"
+          id="url-field"
+          placeholder="http://127.0.0.1:8001"
+          spellcheck="false"
+        >
+        <button class="url-input__btn" id="url-connect">Conectar</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       DASHBOARD GRID
+       ═══════════════════════════════════════════════════════════ -->
+  <main class="dashboard-grid">
+
+    <!-- ── Panel: Motores ── -->
+    <section class="panel panel--full" id="panel-motores">
+      <div class="panel__header">
+        <h2 class="panel__title">Motores</h2>
+        <span class="panel__badge" id="motor-count">—</span>
+      </div>
+      <div class="tabs" id="motor-tabs">
+        <!-- Tabs generated dynamically -->
+      </div>
+      <div class="panel__body">
+        <table class="motor-table">
+          <thead>
+            <tr>
+              <th>Motor</th>
+              <th>Ángulo</th>
+              <th>Vel (rad/s)</th>
+              <th>Torque (Nm)</th>
+              <th>Temp (°C)</th>
+            </tr>
+          </thead>
+          <tbody id="motor-tbody">
+            <!-- Rows generated dynamically -->
+          </tbody>
+        </table>
+
+        <div class="temp-chart-container">
+          <canvas id="temp-chart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Panel: IMU ── -->
+    <section class="panel" id="panel-imu">
+      <div class="panel__header">
+        <h2 class="panel__title">IMU — Inclinación</h2>
+      </div>
+      <div class="panel__body">
+        <div class="imu-values">
+          <div class="imu-metric imu-metric--roll">
+            <div class="imu-metric__label">Roll</div>
+            <div>
+              <span class="imu-metric__value" id="imu-roll">0.0</span>
+              <span class="imu-metric__unit">°</span>
+            </div>
+          </div>
+          <div class="imu-metric imu-metric--pitch">
+            <div class="imu-metric__label">Pitch</div>
+            <div>
+              <span class="imu-metric__value" id="imu-pitch">0.0</span>
+              <span class="imu-metric__unit">°</span>
+            </div>
+          </div>
+          <div class="imu-metric imu-metric--yaw">
+            <div class="imu-metric__label">Yaw</div>
+            <div>
+              <span class="imu-metric__value" id="imu-yaw">0.0</span>
+              <span class="imu-metric__unit">°</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="imu-accel">
+          <span class="imu-accel__item">ax:<span class="imu-accel__val" id="imu-ax">0.000</span></span>
+          <span class="imu-accel__item">ay:<span class="imu-accel__val" id="imu-ay">0.000</span></span>
+          <span class="imu-accel__item">az:<span class="imu-accel__val" id="imu-az">0.000</span></span>
+        </div>
+
+        <div class="chart-container">
+          <canvas id="imu-chart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Panel: BMS (Batería) ── -->
+    <section class="panel" id="panel-bms">
+      <div class="panel__header">
+        <h2 class="panel__title">BMS — Batería</h2>
+      </div>
+      <div class="panel__body">
+        <div class="bms-layout">
+          <div class="bms-gauge">
+            <svg class="bms-gauge__svg" viewBox="0 0 120 120">
+              <circle class="bms-gauge__track" cx="60" cy="60" r="54" />
+              <circle class="bms-gauge__fill" id="bms-gauge-fill" cx="60" cy="60" r="54"
+                stroke-dasharray="339.29" stroke-dashoffset="339.29" />
+            </svg>
+            <div class="bms-gauge__text">
+              <span class="bms-gauge__pct" id="bms-soc">—%</span>
+              <span class="bms-gauge__label">Batería</span>
+            </div>
+          </div>
+
+          <div class="bms-details">
+            <div class="bms-stat">
+              <span class="bms-stat__label">Corriente</span>
+              <span class="bms-stat__value" id="bms-current">— A</span>
+            </div>
+            <div class="bms-stat">
+              <span class="bms-stat__label">Temperatura</span>
+              <span class="bms-stat__value" id="bms-temp">— °C</span>
+            </div>
+
+            <div id="bms-cells-section" class="bms-cells hidden">
+              <div class="bms-cells__title">Voltaje de celdas</div>
+              <div class="bms-cells__grid" id="bms-cells-grid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Panel: Fuerzas ── -->
+    <section class="panel" id="panel-fuerzas">
+      <div class="panel__header">
+        <h2 class="panel__title">Fuerzas — Apoyo</h2>
+      </div>
+      <div class="panel__body">
+        <div class="forces-layout">
+          <div id="forces-diagram" class="forces-diagram">
+            <!-- Built dynamically -->
+          </div>
+          <div class="forces-legend">
+            <span class="forces-legend__item">
+              <span class="forces-legend__dot forces-legend__dot--on"></span> Apoyado
+            </span>
+            <span class="forces-legend__item">
+              <span class="forces-legend__dot forces-legend__dot--off"></span> En el aire
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Panel: Muestras / CSV ── -->
+    <section class="panel" id="panel-muestras">
+      <div class="panel__header">
+        <h2 class="panel__title">Captura de Muestras</h2>
+      </div>
+      <div class="panel__body">
+        <div class="samples-controls">
+          <button class="btn btn--primary" id="btn-capture">Capturar</button>
+          <button class="btn btn--secondary" id="btn-csv" disabled>Descargar CSV</button>
+          <button class="btn btn--danger" id="btn-clear" disabled>Limpiar</button>
+          <span class="samples-count">
+            Muestras: <span class="samples-count__num" id="sample-count">0</span>
+          </span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer__stats">
+      <span class="footer__stat">Robot: <span class="footer__stat-value" id="stat-robot">—</span></span>
+      <span class="footer__stat">Modo: <span class="footer__stat-value" id="stat-mode">—</span></span>
+      <span class="footer__stat">Tiempo: <span class="footer__stat-value" id="stat-ts">0.0s</span></span>
+      <span class="footer__stat">Frecuencia: <span class="footer__stat-value" id="stat-freq">0 Hz</span></span>
+      <span class="footer__stat">Mensajes: <span class="footer__stat-value" id="stat-msgs">0</span></span>
+    </div>
+    <span>TP05 — Desarrollo de Aplicaciones II — UADE</span>
+  </footer>
+
+  <!-- Dashboard Module -->
+  <script type="module" src="js/dashboard.js"></script>
+
+</body>
+</html>
