@@ -61,10 +61,19 @@ class Paseo:
             for vx, vy, vyaw, segundos in RECORRIDO:
                 if self._parar.is_set():
                     return
+                # Si alguien externo esta manejando la base a mano (ej. el
+                # control WASD del dashboard), el paseo espera en vez de
+                # pelearse por la velocidad.
+                while self.mundo.en_manual() and not self._parar.is_set():
+                    time.sleep(0.1)
+                if self._parar.is_set():
+                    return
                 # set_velocidad recorta al perfil y no levanta excepciones:
                 # es el mismo camino que usa el servicio de locomocion.
                 self.mundo.set_velocidad(vx, vy, vyaw, segundos)
                 fin = time.monotonic() + segundos
                 while time.monotonic() < fin and not self._parar.is_set():
+                    if self.mundo.en_manual():
+                        break   # el usuario tomo el control: corta este tramo
                     time.sleep(0.1)
             self.mundo.detener()

@@ -9,6 +9,7 @@
 import { TelemetrySocket } from './websocket.js';
 import { applyChartDefaults, ImuChart, TempChart } from './charts.js';
 import { SampleCapture } from './csv-export.js';
+import { WasdControl } from './control.js';
 
 /* ══════════════════════════════════════════════════════════════
    Constants & State
@@ -50,6 +51,8 @@ let imuChart = null;
 let tempChart = null;
 /** @type {SampleCapture} */
 let sampler = null;
+/** @type {WasdControl} */
+let wasdControl = null;
 
 /* ══════════════════════════════════════════════════════════════
    DOM References (populated in init)
@@ -88,6 +91,13 @@ async function init() {
   $('#btn-capture').addEventListener('click', onCapture);
   $('#btn-csv').addEventListener('click', () => sampler.download());
   $('#btn-clear').addEventListener('click', onClearSamples);
+
+  // Control manual WASD (extensión fuera del contrato del TP05)
+  wasdControl = new WasdControl(() => state.baseUrl);
+  wasdControl.onUpdate = onControlUpdate;
+  $('#control-toggle').addEventListener('change', (e) => {
+    wasdControl.setEnabled(e.target.checked);
+  });
 
   // Chart.js defaults
   applyChartDefaults();
@@ -418,6 +428,36 @@ function updateForces(fuerzas) {
       // It's the paw container
       el.classList.toggle('forces-paw--active', val === 1);
     }
+  }
+}
+
+/* ── Control Manual (WASD) ── */
+
+const CONTROL_KEY_IDS = { w: '#key-w', a: '#key-a', s: '#key-s', d: '#key-d' };
+const CONTROL_KEY_ALIASES = {
+  arrowup: 'w', arrowdown: 's', arrowleft: 'a', arrowright: 'd',
+};
+
+function onControlUpdate({ active, keys, warning }) {
+  // Resalta las teclas activas (mapea flechas a WASD para el resaltado)
+  const activas = new Set([...keys].map(k => CONTROL_KEY_ALIASES[k] || k));
+  for (const [key, sel] of Object.entries(CONTROL_KEY_IDS)) {
+    $(sel)?.classList.toggle('control-key--active', activas.has(key));
+  }
+
+  const statusEl = $('#control-status');
+  if (!statusEl) return;
+  statusEl.classList.remove('control-info__value--warning');
+
+  if (warning) {
+    statusEl.textContent = warning;
+    statusEl.classList.add('control-info__value--warning');
+  } else if (!active) {
+    statusEl.textContent = 'Deshabilitado';
+  } else if (activas.size === 0) {
+    statusEl.textContent = 'Habilitado — sin movimiento';
+  } else {
+    statusEl.textContent = `Moviendo: ${[...activas].join(' + ').toUpperCase()}`;
   }
 }
 

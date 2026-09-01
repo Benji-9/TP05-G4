@@ -5,8 +5,9 @@ from __future__ import annotations
 import asyncio
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi import Body, FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 from config import API_CORS_ORIGINS, ROBOT_ACTIVO, ROBOTS, TELEMETRY_RATE_HZ, WEBSOCKET_RATE_HZ
 from telemetry_adapter import adaptar_telemetria
@@ -19,13 +20,21 @@ modo_activo = "demo"
 active_websockets: set[WebSocket] = set()
 clientes_totales = 0
 
+# Cliente de control manual (WASD), solo si arrancar_api.py lo conecto al
+# simulador local. ESTO NO ES PARTE DEL CONTRATO DEL TP05 -- el enunciado pide
+# un dashboard de solo lectura (ver API.md) -- es una extension para mover el
+# robot en el simulador local, a pedido del alumno. Se queda en None (y las
+# rutas de /control devuelven 503) contra el robot real o en modo --demo.
+control = None
 
-def configurar(lector, modelo: str, modo: str) -> None:
+
+def configurar(lector, modelo: str, modo: str, control_cliente=None) -> None:
     """Inyecta el lector antes de que uvicorn comience a servir."""
-    global reader, modelo_activo, modo_activo
+    global reader, modelo_activo, modo_activo, control
     reader = lector
     modelo_activo = modelo
     modo_activo = modo
+    control = control_cliente
 
 
 @asynccontextmanager
@@ -107,6 +116,48 @@ def info():
 @app.get("/modo")
 def modo():
     return {"modo": modo_activo, "robot": modelo_activo}
+
+
+# ---------------------------------------------------------------------------
+# Control manual (WASD) -- FUERA del contrato del TP05.
+#
+# API.md es explicito: "no hay ningun endpoint que mueva el robot, este TP es
+# de visualizacion". Estas rutas son una extension aparte para practicar con
+# el simulador local; `control` solo esta seteado cuando arrancar_api.py se
+# conecto al socket local del simulador (nunca contra el robot real ni en
+# --demo), asi que no hay forma de que esto termine moviendo el robot fisico.
+# ---------------------------------------------------------------------------
+
+class ComandoMovimiento(BaseModel):
+    vx: float = 0.0
+    vy: float = 0.0
+    vyaw: float = 0.0
+    duracion: float = 0.4
+
+
+def _requerir_control():
+    if control is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Control manual no disponible (no es el simulador local, "
+                   "o el backend arranco sin el).",
+        )
+    return control
+
+
+@app.post("/control/mover")
+def control_mover(cmd: ComandoMovimiento = Body(...)):
+    cliente = _requerir_control()
+    if cliente.Move(cmd.vx, cmd.vy, cmd.vyaw, cmd.duracion) != 0:
+        raise HTTPException(status_code=502, detail="El simulador rechazo el movimiento")
+    return {"ok": True}
+
+
+@app.post("/control/detener")
+def control_detener():
+    cliente = _requerir_control()
+    cliente.StopMove()
+    return {"ok": True}
 
 
 @app.websocket("/ws")

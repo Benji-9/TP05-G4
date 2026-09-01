@@ -138,6 +138,11 @@ class ServidorLocal(socketserver.ThreadingTCPServer):
     def _orden_mover(self, pedido: dict) -> dict:
         # set_velocidad RECORTA en vez de rechazar, igual que por DDS: la
         # validacion que el alumno ve vive en robot.py, antes de mandar.
+        #
+        # marcar_manual() avisa al paseo automatico del TP05 (paseo.py) que
+        # alguien externo -- por ejemplo el control WASD del dashboard -- esta
+        # manejando la base, asi el paseo cede en vez de pelear la velocidad.
+        self.mundo.marcar_manual()
         self.mundo.set_velocidad(float(pedido.get("vx", 0.0)),
                                  float(pedido.get("vy", 0.0)),
                                  float(pedido.get("vyaw", 0.0)),
@@ -146,6 +151,7 @@ class ServidorLocal(socketserver.ThreadingTCPServer):
 
     def _orden_detener(self, _pedido: dict) -> dict:
         # Frenar es velocidad cero. NUNCA desenergizar ni cambiar la postura.
+        self.mundo.marcar_manual()
         self.mundo.detener()
         return {"ok": True}
 

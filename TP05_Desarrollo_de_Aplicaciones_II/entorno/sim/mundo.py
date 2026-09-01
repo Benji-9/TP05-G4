@@ -57,6 +57,7 @@ class Mundo:
             self.de_pie = True
             self.altura = 0.0        # offset sobre la altura normal, en metros
             self.avisos = []
+            self._manual_hasta = 0.0
 
     # ---------- ordenes ----------
     def mover(self, vx: float, vy: float, vyaw: float, tiempo: float) -> None:
@@ -144,6 +145,21 @@ class Mundo:
             self.vx = self.vy = self.vyaw = 0.0
             self._vence_en = 0.0
             self.accion = "quieto"
+
+    # --- control manual externo (ej. WASD del dashboard) ---
+    def marcar_manual(self, duracion: float = 0.8) -> None:
+        """Avisa que un cliente externo esta manejando la base a mano.
+
+        El paseo automatico del TP05 (paseo.py) consulta en_manual() y cede el
+        control mientras dure, para no pelearse por la velocidad con quien
+        este manejando desde el dashboard.
+        """
+        with self._lock:
+            self._manual_hasta = time.monotonic() + duracion
+
+    def en_manual(self) -> bool:
+        with self._lock:
+            return time.monotonic() < self._manual_hasta
 
     def gesto(self, nombre: str, duracion: float = 2.0) -> None:
         with self._lock:

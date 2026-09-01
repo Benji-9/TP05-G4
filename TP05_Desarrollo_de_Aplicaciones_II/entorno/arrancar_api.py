@@ -41,6 +41,7 @@ def main(argv=None) -> int:
     from api.telemetry_server import app, configurar
     from api.telemetry_reader import DemoReader, TelemetryReader
 
+    control = None
     if args.demo:
         lector, modo = DemoReader(args.robot), "demo"
     else:
@@ -55,7 +56,20 @@ def main(argv=None) -> int:
             return 1
         modo = "simulador"
 
-    configurar(lector, args.robot, modo)
+        # Control manual (WASD) del dashboard -- EXTENSION fuera del contrato
+        # del TP05 (API.md dice que el TP es de solo lectura). Solo se conecta
+        # aca, contra el socket local del simulador: nunca contra el robot
+        # real, que no corre este mismo lector. Si falla, el backend sigue
+        # andando igual, solo sin /control.
+        try:
+            from sim.local import ClienteLocal
+            control = ClienteLocal()
+            control.Init()
+        except Exception as exc:                                # noqa: BLE001
+            print(f"  Aviso: no se pudo conectar el control manual ({exc})")
+            control = None
+
+    configurar(lector, args.robot, modo, control_cliente=control)
     ip = ip_de_la_maquina()
 
     print()
@@ -72,6 +86,11 @@ def main(argv=None) -> int:
     for e in ("/telemetria", "/motores", "/imu", "/bms", "/fuerzas", "/info"):
         print(f"        GET  {e}")
     print(f"        WS   ws://{ip}:{args.puerto}/ws     (tiempo real)")
+    if control is not None:
+        print()
+        print("  Control manual (WASD, fuera del contrato del TP05):")
+        print(f"        POST {'/control/mover'}")
+        print(f"        POST {'/control/detener'}")
     print()
     print(f"  Documentacion: http://{ip}:{args.puerto}/docs")
     print("=" * 66)
