@@ -319,29 +319,36 @@ class SimuladorOficial:
         self.mj.mj_forward(self.model, self.data)
         self._completar_telemetria(e)
 
-    # ---------- teclado (WASD, maneja el robot desde la propia ventana) ----------
+    # ---------- teclado (flechas, maneja el robot desde la propia ventana) ----------
     #
-    # Los codigos GLFW de las letras son el ASCII de la mayuscula. Espacio
-    # frena. No hay forma de saber cuando se SUELTA una tecla -- GLFW/MuJoCo
-    # solo avisan la apretada -- asi que cada evento pide velocidad por
-    # _DURACION_TECLADO nada mas: si la tecla sigue apretada, el sistema
-    # operativo repite el evento (auto-repeat) y el comando se refresca antes
-    # de vencer; si se solto, se frena solo. Es EL MISMO mecanismo que Move()
-    # sin refrescar en robot.py -- nada nuevo que aprender ni que romper.
-    _TECLA_W, _TECLA_A, _TECLA_S, _TECLA_D = ord("W"), ord("A"), ord("S"), ord("D")
+    # NO usamos WASD: MuJoCo le asigna a CADA letra del abecedario un atajo de
+    # visualizacion (mujoco.mjVISSTRING / mjRNDSTRING) -- W es wireframe, A es
+    # "auto connect", S es sombras, D es "static body" (el filtro celeste que
+    # tiñe cuerpos estaticos, lo que se ve como "las articulaciones en azul").
+    # No hay una sola letra libre: las 26 estan tomadas por el visor oficial.
+    # Las flechas no estan en ninguna de esas dos tablas.
+    #
+    # Codigos GLFW de las flechas (no son ASCII). Espacio frena. No hay forma
+    # de saber cuando se SUELTA una tecla -- GLFW/MuJoCo solo avisan la
+    # apretada -- asi que cada evento pide velocidad por _DURACION_TECLADO
+    # nada mas: si la tecla sigue apretada, el sistema operativo repite el
+    # evento (auto-repeat) y el comando se refresca antes de vencer; si se
+    # solto, se frena solo. Es EL MISMO mecanismo que Move() sin refrescar en
+    # robot.py -- nada nuevo que aprender ni que romper.
+    _TECLA_ARRIBA, _TECLA_ABAJO, _TECLA_IZQUIERDA, _TECLA_DERECHA = 265, 264, 263, 262
     _TECLA_ESPACIO = 32
     _DURACION_TECLADO = 0.5
 
     def _teclado(self, keycode: int) -> None:
         p = self.mundo.perfil
         vx = vyaw = 0.0
-        if keycode == self._TECLA_W:
+        if keycode == self._TECLA_ARRIBA:
             vx = p.velocidad_max
-        elif keycode == self._TECLA_S:
+        elif keycode == self._TECLA_ABAJO:
             vx = -p.velocidad_max
-        elif keycode == self._TECLA_A:
+        elif keycode == self._TECLA_IZQUIERDA:
             vyaw = p.velocidad_angular_max
-        elif keycode == self._TECLA_D:
+        elif keycode == self._TECLA_DERECHA:
             vyaw = -p.velocidad_angular_max
         elif keycode == self._TECLA_ESPACIO:
             self.mundo.marcar_manual()
