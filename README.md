@@ -15,24 +15,48 @@ y la visualiza en vivo: motores, IMU, batería (BMS) y fuerzas por pata.
 Seguir `TP05_Desarrollo_de_Aplicaciones_II/INSTALACION.md` (Python 3.10+ y
 `pip install mujoco`, `fastapi`, `uvicorn`).
 
-### 2. Levantar el simulador + backend
+### 2. Levantar todo (Windows, un solo paso)
 
-# Opción 1: Doble clic en INICIAR_TP05.bat (elige robot interactivamente)
-**Dejar esa ventana abierta.**
+Doble clic en `iniciar_all.bat` (en la raíz del repo). Instala dependencias
+si faltan, pregunta qué robot usar, y abre el simulador, el backend y el
+dashboard en sus propias ventanas — no hace falta nada más.
 
-# Opción 2: Manual (dos terminales)
-# Terminal 1 - Simulador:
+Si preferís hacerlo a mano (o estás en macOS/Linux), seguí los pasos 2b y 3.
+
+### 2b. Levantar el simulador + backend (manual)
+
+**Opción 1:** doble clic en `TP05_Desarrollo_de_Aplicaciones_II/INICIAR_TP05.bat`
+(elige robot interactivamente). **Dejar esa ventana abierta.**
+
+**Opción 2:** manual, en dos terminales:
+
+```bash
+# Terminal 1 - Simulador
 cd TP05_Desarrollo_de_Aplicaciones_II/entorno
 python -m sim --robot g1 --materia tp05
 
-# Terminal 2 - Backend API:
+# Terminal 2 - Backend API
 cd TP05_Desarrollo_de_Aplicaciones_II
 python entorno/arrancar_api.py --robot g1
+```
 
-### 3. Abrir el dashboard
+### 3. Abrir el dashboard (manual — `iniciar_all.bat` ya hace esto solo)
 
-Abrir `mi_dashboard/dashboard.html` en el navegador. Pegar la dirección que
-mostró la consola en el campo de configuración del dashboard.
+`dashboard.js` usa módulos ES (`import`/`export`), y los navegadores
+(Chrome/Edge) bloquean los módulos si abrís el HTML directo con doble clic
+(`file://`). Por eso hay que servirlo por HTTP:
+
+```bash
+cd mi_dashboard
+python -m http.server 5500
+```
+
+O doble clic en `mi_dashboard/iniciar_dashboard.bat` (Windows) /
+`./mi_dashboard/iniciar_dashboard.sh` (macOS/Linux), que hacen lo mismo y
+abren el navegador solos.
+
+Abrir `http://localhost:5500/dashboard.html` y pegar la dirección que mostró
+la consola del backend en el campo de configuración del dashboard.
 
 Para probar rápido que el backend responde:
 `http://<IP>:8001/telemetria`
@@ -71,14 +95,15 @@ TP05_.../ → paquete provisto por la cátedra (sin modificar)
 
 No todos los valores son mediciones reales del robot — algunos están derivados
 del movimiento simulado (torque, temperatura, roll/pitch, fuerzas, batería).
-Detalle completo en `docs/documento-tecnico.md` y en
+Detalle completo en `docs/docTecnico.md` y en
 `TP05_.../API.md`.
 
 ---
 
 ## Documento técnico
 
-Ver [`docs/documento-tecnico.md`](docs/documento-tecnico.md).
+Ver [`docs/docTecnico.md`](docs/docTecnico.md) (actualmente vacío — pendiente
+de completar).
 
 ---
 

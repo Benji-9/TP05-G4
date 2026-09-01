@@ -296,8 +296,9 @@ function updateMotorTable(allMotors) {
   const tbody = $('#motor-tbody');
   if (!tbody) return;
 
-  // Rebuild if motor count changed (tab switch)
-  if (tbody.children.length !== motors.length) {
+  // Rebuild on tab switch or when motor count changed
+  if (tbody.dataset.groupId !== state.activeTab || tbody.children.length !== motors.length) {
+    tbody.dataset.groupId = state.activeTab;
     tbody.innerHTML = motors.map(m => `
       <tr id="motor-row-${m.id}">
         <td class="motor-name">${m.nombre}</td>
