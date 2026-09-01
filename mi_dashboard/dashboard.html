@@ -203,46 +203,6 @@
       </div>
     </section>
 
-    <!-- ── Panel: Control Manual (WASD) ──
-         Extensión fuera del contrato del TP05: API.md pide un dashboard de
-         solo lectura. Esto solo mueve el robot en el simulador local (el
-         backend expone /control únicamente cuando está conectado a él) y
-         nunca funciona contra el robot real ni en modo --demo. -->
-    <section class="panel panel--full" id="panel-control">
-      <div class="panel__header">
-        <h2 class="panel__title">Control Manual — WASD</h2>
-        <label class="control-toggle">
-          <input type="checkbox" id="control-toggle">
-          <span>Habilitar</span>
-        </label>
-      </div>
-      <div class="panel__body">
-        <p class="control-disclaimer">
-          Fuera del alcance del TP05 (que es de solo lectura). Solo mueve el
-          robot en el simulador local; no tiene efecto contra el robot real ni
-          en modo <code>--demo</code>.
-        </p>
-        <div class="control-layout">
-          <div class="control-pad">
-            <span class="control-key" id="key-w" data-key="w">W</span>
-            <span class="control-key" id="key-a" data-key="a">A</span>
-            <span class="control-key" id="key-s" data-key="s">S</span>
-            <span class="control-key" id="key-d" data-key="d">D</span>
-          </div>
-          <div class="control-info">
-            <div>
-              <span class="control-info__label">Estado</span>
-              <span class="control-info__value" id="control-status">Deshabilitado</span>
-            </div>
-            <p class="control-hint">
-              W/A/S/D o flechas para moverse · Espacio para frenar. Se
-              desactiva solo al escribir en un campo de texto.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
   </main>
 
   <!-- ═══════════════════════════════════════════════════════════

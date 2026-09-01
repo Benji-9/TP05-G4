@@ -319,12 +319,49 @@ class SimuladorOficial:
         self.mj.mj_forward(self.model, self.data)
         self._completar_telemetria(e)
 
+    # ---------- teclado (WASD, maneja el robot desde la propia ventana) ----------
+    #
+    # Los codigos GLFW de las letras son el ASCII de la mayuscula. Espacio
+    # frena. No hay forma de saber cuando se SUELTA una tecla -- GLFW/MuJoCo
+    # solo avisan la apretada -- asi que cada evento pide velocidad por
+    # _DURACION_TECLADO nada mas: si la tecla sigue apretada, el sistema
+    # operativo repite el evento (auto-repeat) y el comando se refresca antes
+    # de vencer; si se solto, se frena solo. Es EL MISMO mecanismo que Move()
+    # sin refrescar en robot.py -- nada nuevo que aprender ni que romper.
+    _TECLA_W, _TECLA_A, _TECLA_S, _TECLA_D = ord("W"), ord("A"), ord("S"), ord("D")
+    _TECLA_ESPACIO = 32
+    _DURACION_TECLADO = 0.5
+
+    def _teclado(self, keycode: int) -> None:
+        p = self.mundo.perfil
+        vx = vyaw = 0.0
+        if keycode == self._TECLA_W:
+            vx = p.velocidad_max
+        elif keycode == self._TECLA_S:
+            vx = -p.velocidad_max
+        elif keycode == self._TECLA_A:
+            vyaw = p.velocidad_angular_max
+        elif keycode == self._TECLA_D:
+            vyaw = -p.velocidad_angular_max
+        elif keycode == self._TECLA_ESPACIO:
+            self.mundo.marcar_manual()
+            self.mundo.detener()
+            return
+        else:
+            return
+
+        # marcar_manual() avisa al paseo automatico del TP05 que alguien
+        # esta manejando a mano, para que ceda en vez de pelear la velocidad.
+        self.mundo.marcar_manual(self._DURACION_TECLADO + 0.3)
+        self.mundo.set_velocidad(vx, 0.0, vyaw, self._DURACION_TECLADO)
+
     # ---------- bucles ----------
     def correr_con_ventana(self):
         import mujoco.viewer
 
         with mujoco.viewer.launch_passive(
-            self.model, self.data, show_left_ui=False, show_right_ui=False
+            self.model, self.data, show_left_ui=False, show_right_ui=False,
+            key_callback=self._teclado,
         ) as v:
             v.cam.distance = 3.5 if self.robot.tipo == "humanoide" else 2.6
             v.cam.elevation = -20
