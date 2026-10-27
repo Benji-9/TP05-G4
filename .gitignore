@@ -29,3 +29,6 @@ mi_dashboard/**/*.csv
 !docs/telemetria_ejemplo.csv
 # === Config local de Claude Code (no se versiona) ===
 .claude/
+
+# === Playwright MCP (capturas y logs temporales de pruebas) ===
+.playwright-mcp/
