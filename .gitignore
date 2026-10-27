@@ -27,3 +27,5 @@ uade_simulador_activo.json
 # (dejar solo el CSV final que van a entregar en docs/)
 mi_dashboard/**/*.csv
 !docs/telemetria_ejemplo.csv
+# === Config local de Claude Code (no se versiona) ===
+.claude/
