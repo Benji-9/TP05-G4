@@ -47,7 +47,7 @@ export class SampleCapture {
     headers.push('roll', 'pitch', 'yaw', 'ax', 'ay', 'az');
 
     // BMS
-    headers.push('soc', 'corriente', 'bms_temp');
+    headers.push('soc', 'corriente_mA', 'bms_temp');
 
     // Motors (dynamic)
     const nMotors = first.motores ? first.motores.length : 0;

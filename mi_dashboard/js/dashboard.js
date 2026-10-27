@@ -384,7 +384,7 @@ function updateBMS(bms) {
     circle.style.strokeDashoffset = `${offset}`;
   }
 
-  $('#bms-current').textContent = `${bms.corriente} A`;
+  $('#bms-current').textContent = `${bms.corriente} mA`;
   $('#bms-temp').textContent = `${bms.temperatura.toFixed(1)} °C`;
 
   // Cell voltages
