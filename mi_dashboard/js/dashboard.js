@@ -254,7 +254,7 @@ function connectSocket() {
   if (socket) socket.close();
 
   const wsUrl = state.baseUrl.replace(/^http/, 'ws') + '/ws';
-  socket = new TelemetrySocket(wsUrl);
+  socket = new TelemetrySocket(wsUrl, `${state.baseUrl}/telemetria`);
 
   socket.onStatus = (status) => {
     const dot = $('#connection-dot');
@@ -263,7 +263,7 @@ function connectSocket() {
     dot.className = 'connection__dot';
 
     // Aviso en los paneles mientras no haya datos vigentes
-    document.body.classList.toggle('is-offline', status !== 'connected');
+    document.body.classList.toggle('is-offline', status !== 'connected' && status !== 'polling');
     $('#offline-banner').textContent = status === 'connecting'
       ? 'Conectando con el backend…'
       : 'Sin conexión con el backend — se muestra el último dato recibido';
@@ -272,6 +272,10 @@ function connectSocket() {
       case 'connected':
         dot.classList.add('connection__dot--connected');
         label.textContent = 'Conectado';
+        break;
+      case 'polling':
+        dot.classList.add('connection__dot--connected');
+        label.textContent = 'Conectado (polling)';
         break;
       case 'connecting':
         dot.classList.add('connection__dot--connecting');

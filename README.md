@@ -95,7 +95,8 @@ es lo que falta tildar al entregar):
 - **Frontend:** HTML5 + CSS3 + JavaScript (vanilla)
 - **Gráficos:** Chart.js 4.4.7 (copia local en `mi_dashboard/vendor/`)
 - **Comunicación:** WebSocket (`/ws`, ~10 Hz) para la telemetría y `GET /info` para
-  conocer el robot. No hay respaldo por polling.
+  conocer el robot. Si el WebSocket no conecta, pasa a polling de `GET /telemetria`
+  (cada 500 ms) y lo indica en el header ("Conectado (polling)").
 - **Backend:** API provista por la cátedra, sin modificaciones
 
 ---

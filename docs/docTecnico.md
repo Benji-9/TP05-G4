@@ -14,7 +14,7 @@ Simulador / robot ──► backend FastAPI (:8001) ──► navegador (dashboa
                                                    └ csv-export.js (captura/CSV)
 ```
 
-**Endpoints que consume el dashboard:** `GET /info` (modelo, tipo, nombres de motores y patas; se pide al iniciar y de nuevo si falla o si el `modelo` de los frames cambia) y `WS /ws` (el mismo JSON que `/telemetria`, ~10 veces por segundo). El resto (`/telemetria`, `/motores`, `/imu`, `/bms`, `/fuerzas`, `/modo`) está disponible pero no se usa: el dashboard solo necesita `/info` y `/ws`.
+**Endpoints que consume el dashboard:** `GET /info` (modelo, tipo, nombres de motores y patas; se pide al iniciar y de nuevo si falla o si el `modelo` de los frames cambia) y `WS /ws` (el mismo JSON que `/telemetria`, ~10 veces por segundo). `GET /telemetria` se usa solo como **respaldo por polling** (cada 500 ms) cuando el WebSocket no logra conectar. El resto (`/motores`, `/imu`, `/bms`, `/fuerzas`, `/modo`) está disponible pero no se usa.
 
 **Estructura del frontend**
 
@@ -53,7 +53,7 @@ Simulador / robot ──► backend FastAPI (:8001) ──► navegador (dashboa
 | Complejidad | Muy simple: `fetch` + `setInterval`. | Mayor: hay que manejar estados de conexión y reconexión (resuelto en `TelemetrySocket`). |
 | Caída del servidor | Cada fallo es una petición aislada. | Hay que detectar el cierre y reconectar. |
 
-Elegimos **WebSocket** como único canal de telemetría porque los gráficos en vivo necesitan una frecuencia mayor que la del polling de 500 ms y porque evita una petición HTTP por muestra. El costo es la lógica de reconexión, que se concentró en una clase. No se implementó un respaldo por polling. No hicimos mediciones de latencia ni de carga: la comparación es cualitativa.
+Elegimos **WebSocket** como canal principal porque los gráficos en vivo necesitan una frecuencia mayor que la del polling de 500 ms y porque evita una petición HTTP por muestra. El costo es la lógica de reconexión, que se concentró en una clase. Como **respaldo**, tras 3 intentos fallidos de WebSocket seguidos `TelemetrySocket` pasa a polling de `/telemetria` cada 500 ms (la consigna admite polling de hasta 500 ms), sigue reintentando el WebSocket y vuelve a él apenas conecta. Esto nos importó en la práctica: con `uvicorn` sin la librería `websockets`, `/ws` responde 404 y, sin respaldo, el dashboard quedaba sin datos; con el respaldo muestra "Conectado (polling)" a 2 Hz. No hicimos mediciones de latencia ni de carga: la comparación es cualitativa.
 
 ## 5. Datos reales y derivados
 
