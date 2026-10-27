@@ -95,10 +95,10 @@ export class ImuChart {
           {
             label: 'Yaw',
             data: this._yawData,
-            borderColor: MONO.gray300,
+            borderColor: MONO.gray700,     // gray300 casi no se veía sobre blanco
             backgroundColor: 'transparent',
             borderWidth: 2,
-            borderDash: [2, 2],            // dotted
+            borderDash: [2, 3],            // dotted
             pointRadius: 0,
             tension: 0.3,
             fill: false,
