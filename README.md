@@ -1,8 +1,8 @@
 # TP05-G4 — Dashboard Web de Telemetría Robótica
 
 **Materia:** Desarrollo de Aplicaciones II — Comisión Lunes TM — UADE
-**Equipo:** [Nombres de los integrantes]
-**Robot:** [G1 / Go2]
+**Equipo:** ver [Integrantes](#integrantes)
+**Robot:** G1 (29 motores) y Go2 (12 motores): el dashboard se arma según lo que informa `/info`
 
 Dashboard web que consume la telemetría de un robot Unitree (simulado o real)
 y la visualiza en vivo: motores, IMU, batería (BMS) y fuerzas por pata.
@@ -64,30 +64,37 @@ Para probar rápido que el backend responde:
 ---
 
 ## Estructura del repo
-mi_dashboard/ → nuestro código (HTML/CSS/JS)
+mi_dashboard/ → nuestro código (HTML/CSS/JS; `vendor/` trae Chart.js en local)
 docs/ → documento técnico, capturas, CSV de ejemplo
-TP05_.../ → paquete provisto por la cátedra (sin modificar)
+TP05_.../ → paquete provisto por la cátedra. La API (`entorno/api/`) no se
+            modificó; en el simulador (`entorno/sim/`) agregamos el manejo con
+            las flechas del teclado en la ventana de MuJoCo (no toca la API)
 
 ---
 
 ## Paneles implementados
 
-- [ ] Motores (temperatura con semáforo, ángulo, velocidad, torque)
-- [ ] IMU (roll, pitch, yaw + gráfico histórico)
-- [ ] BMS (batería, corriente, voltajes de celda)
-- [ ] Fuerzas por pata (FR, FL, RR, RL)
-- [ ] Captura de muestras
-- [ ] Exportación CSV
-- [ ] WebSocket (conexión principal, con reconexión automática)
+Implementados en el código (la verificación visual en navegador con G1 y Go2
+es lo que falta tildar al entregar):
+
+- [x] Motores (semáforo verde/amarillo/rojo, ángulo, velocidad, torque, gráficos de temperatura)
+- [x] IMU (roll, pitch, yaw + gráfico histórico de 300 muestras)
+- [x] BMS (batería, corriente en mA, temperatura, voltajes de celda si el backend los envía)
+- [x] Fuerzas por pata (FR, FL, RR, RL en Go2; pies en G1)
+- [x] Captura de muestras
+- [x] Exportación CSV (en el navegador, sin pasar por el servidor)
+- [x] WebSocket con reconexión automática y aviso visual de pérdida de conexión
+- [ ] Capturas de pantalla y CSV de ejemplo en `docs/` (pendiente, ver #17)
 
 ---
 
 ## Stack
 
 - **Frontend:** HTML5 + CSS3 + JavaScript (vanilla)
-- **Gráficos:** Chart.js (CDN)
-- **Comunicación:** WebSocket (`/ws`, ~10 Hz) con fallback a polling REST (`/telemetria`)
-- **Backend:** provisto por la cátedra, sin modificaciones
+- **Gráficos:** Chart.js 4.4.7 (copia local en `mi_dashboard/vendor/`)
+- **Comunicación:** WebSocket (`/ws`, ~10 Hz) para la telemetría y `GET /info` para
+  conocer el robot. No hay respaldo por polling.
+- **Backend:** API provista por la cátedra, sin modificaciones
 
 ---
 
@@ -102,8 +109,7 @@ Detalle completo en `docs/docTecnico.md` y en
 
 ## Documento técnico
 
-Ver [`docs/docTecnico.md`](docs/docTecnico.md) (actualmente vacío — pendiente
-de completar).
+Ver [`docs/docTecnico.md`](docs/docTecnico.md).
 
 ---
 
