@@ -1,0 +1,31 @@
+name: Tarea / mejora
+description: Algo para implementar o mejorar en el dashboard
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: que
+    attributes:
+      label: Qué hay que hacer
+      description: En una o dos oraciones.
+    validations:
+      required: true
+  - type: dropdown
+    id: panel
+    attributes:
+      label: Panel afectado
+      options: [Motores, IMU, BMS, Fuerzas, Captura/CSV, General/estado, Documentación]
+    validations:
+      required: true
+  - type: textarea
+    id: consigna
+    attributes:
+      label: Criterio de la consigna o rúbrica que cubre
+      description: Ej. "semáforo verde <40 / amarillo 40–60 / rojo >60".
+    validations:
+      required: true
+  - type: textarea
+    id: hecho
+    attributes:
+      label: Criterio de aceptación
+      description: Cómo sabemos que está terminado.
+      placeholder: "- [ ] ..."

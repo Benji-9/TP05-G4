@@ -1,0 +1,33 @@
+name: Bug
+description: Algo no funciona como debería
+labels: ["bug"]
+body:
+  - type: textarea
+    id: pasa
+    attributes:
+      label: Qué pasa
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Cómo reproducirlo
+      placeholder: "1. ...\n2. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Qué debería pasar
+    validations:
+      required: true
+  - type: dropdown
+    id: robot
+    attributes:
+      label: Robot / modo
+      options: [G1 simulador, Go2 simulador, "--demo", Robot real]
+  - type: textarea
+    id: consola
+    attributes:
+      label: Errores de consola o capturas
+      description: Pegá el error de la consola del navegador o arrastrá una captura.

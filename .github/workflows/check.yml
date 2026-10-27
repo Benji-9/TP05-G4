@@ -1,0 +1,27 @@
+name: check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  js-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Los .js son ES modules sin package.json: se copian como .mjs para que
+      # node --check los lea como módulos (import/export).
+      - name: node --check en mi_dashboard/js
+        run: |
+          fail=0
+          for f in mi_dashboard/js/*.js; do
+            tmp="$(mktemp --suffix=.mjs)"
+            cp "$f" "$tmp"
+            node --check "$tmp" || { echo "::error file=$f::error de sintaxis"; fail=1; }
+            rm -f "$tmp"
+          done
+          exit $fail
