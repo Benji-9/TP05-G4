@@ -55,7 +55,7 @@ echo.
 REM ── Dashboard: servido por HTTP (dashboard.js usa modulos ES, que los
 REM    navegadores bloquean si se abre el HTML directo con doble clic). ──
 echo    Abriendo el dashboard...
-start "TP05 - Dashboard" /D "%~dp0mi_dashboard" cmd /k %PYTHON% -m http.server 5500
+start "TP05 - Dashboard" /D "%~dp0mi_dashboard" cmd /k %PYTHON% servidor.py 5500
 ping -n 2 127.0.0.1 >nul
 start "" "http://localhost:5500/dashboard.html"
 

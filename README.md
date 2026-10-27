@@ -50,7 +50,7 @@ python entorno/arrancar_api.py --robot g1
 
 ```bash
 cd mi_dashboard
-python -m http.server 5500
+python servidor.py 5500
 ```
 
 O doble clic en `mi_dashboard/iniciar_dashboard.bat` (Windows) /
