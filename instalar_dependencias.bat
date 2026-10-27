@@ -18,6 +18,7 @@ echo Verificando instalacion...
 py -3 -c "import mujoco; print('  [OK] mujoco', mujoco.__version__)"
 py -3 -c "import fastapi; print('  [OK] fastapi', fastapi.__version__)"
 py -3 -c "import uvicorn; print('  [OK] uvicorn', uvicorn.__version__)"
+py -3 -c "import websockets; print('  [OK] websockets', websockets.__version__)"
 
 echo.
 echo Listo. Ahora podes correr TP05_Desarrollo_de_Aplicaciones_II\INICIAR_TP05.bat
