@@ -183,8 +183,17 @@ export class TempHistoryChart {
         scales: {
           x: { display: false },
           y: {
-            // Eje ajustado a los datos; 40 y 60 °C marcados con el semáforo
+            // Eje ajustado a los datos, con un rango mínimo de 20 °C para no
+            // exagerar variaciones chicas; 40 y 60 °C marcados con el semáforo
             grace: '10%',
+            afterDataLimits: (scale) => {
+              const MIN_SPAN = 20;
+              if (scale.max - scale.min < MIN_SPAN) {
+                const mid = (scale.max + scale.min) / 2;
+                scale.min = mid - MIN_SPAN / 2;
+                scale.max = mid + MIN_SPAN / 2;
+              }
+            },
             grid: {
               color: (ctx) => ctx.tick?.value === 60 ? TEMP_COLORS.danger
                 : ctx.tick?.value === 40 ? TEMP_COLORS.warn

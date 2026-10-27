@@ -22,7 +22,9 @@ export class SampleCapture {
    * @returns {number} New sample count.
    */
   capture(telemetryData) {
-    this.samples.push(structuredClone(telemetryData));
+    const sample = structuredClone(telemetryData);
+    sample.fecha_hora = new Date().toISOString();   // hora real de la captura
+    this.samples.push(sample);
     return this.samples.length;
   }
 
@@ -41,13 +43,15 @@ export class SampleCapture {
 
     // Build headers from the first sample
     const first = this.samples[0];
-    const headers = ['ts', 'modelo'];
+    const headers = ['fecha_hora', 'ts', 'modelo'];
 
     // IMU
     headers.push('roll', 'pitch', 'yaw', 'ax', 'ay', 'az');
 
-    // BMS
+    // BMS (+ voltajes de celda, dinámicos)
     headers.push('soc', 'corriente_mA', 'bms_temp');
+    const nCells = Math.max(0, ...this.samples.map(s => s.bms?.celdas?.length ?? 0));
+    for (let i = 1; i <= nCells; i++) headers.push(`celda_${i}_V`);
 
     // Motors (dynamic)
     const nMotors = first.motores ? first.motores.length : 0;
@@ -68,6 +72,7 @@ export class SampleCapture {
     for (const s of this.samples) {
       const row = [];
 
+      row.push(s.fecha_hora ?? '');
       row.push(s.ts ?? '');
       row.push(s.modelo ?? '');
 
@@ -79,6 +84,7 @@ export class SampleCapture {
       // BMS
       const bms = s.bms || {};
       row.push(bms.soc ?? '', bms.corriente ?? '', bms.temperatura ?? '');
+      for (let i = 0; i < nCells; i++) row.push(bms.celdas?.[i] ?? '');
 
       // Motors
       for (let i = 0; i < nMotors; i++) {
