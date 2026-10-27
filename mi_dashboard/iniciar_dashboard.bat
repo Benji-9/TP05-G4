@@ -17,4 +17,4 @@ if not defined PYTHON (
 )
 
 start "" http://localhost:5500/dashboard.html
-%PYTHON% -m http.server 5500
+%PYTHON% servidor.py 5500
