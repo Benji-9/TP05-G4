@@ -105,10 +105,14 @@ body {
   justify-content: space-between;
   padding: var(--space-md) var(--space-xl);
   border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+/* Header + banner de sin conexión: quedan fijos arriba juntos */
+.topbar {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--bg);
 }
 
 .header__brand {
@@ -859,6 +863,18 @@ body.is-offline .dashboard-grid { opacity: 0.4; transition: opacity 0.3s; }
     grid-template-columns: 1fr;
     justify-items: center;
   }
+
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+  }
+
+  .footer__stats {
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+  }
 }
 
 @media (max-width: 600px) {
@@ -876,5 +892,25 @@ body.is-offline .dashboard-grid { opacity: 0.4; transition: opacity 0.3s; }
 
   .imu-values {
     grid-template-columns: 1fr;
+  }
+
+  /* Tabla de motores: compacta, y si aún no entra scrollea ella sola
+     (nunca la página entera) */
+  .panel__body {
+    padding: var(--space-md);
+  }
+
+  .motor-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .motor-table thead th {
+    letter-spacing: 0.08em;
+    padding: var(--space-sm) 6px;
+  }
+
+  .motor-table td {
+    padding: 7px 6px;
   }
 }
