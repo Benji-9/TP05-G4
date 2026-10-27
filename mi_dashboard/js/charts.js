@@ -18,7 +18,7 @@ const MONO = {
   text:     '#737373',
 };
 
-const MAX_HISTORY = 200;
+const MAX_HISTORY = 300;   // 30 s a 10 Hz — igual al historial de electroSim
 
 /* ── Semáforo de temperatura (igual a electroSim) ── */
 export const TEMP_COLORS = {
