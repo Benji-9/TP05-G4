@@ -86,7 +86,7 @@ es lo que falta tildar al entregar):
 - [x] Captura de muestras
 - [x] Exportación CSV (en el navegador, sin pasar por el servidor)
 - [x] WebSocket con reconexión automática y aviso visual de pérdida de conexión
-- [ ] Capturas de pantalla y CSV de ejemplo en `docs/` (pendiente, ver #17)
+- [x] Capturas de pantalla (`docs/capturas/`, G1 y Go2) y CSV de ejemplo (`docs/telemetria_ejemplo.csv`, 12 muestras descargadas desde el dashboard con el backend en `--demo`)
 
 ---
 
