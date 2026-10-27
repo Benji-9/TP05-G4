@@ -20,6 +20,20 @@ const MONO = {
 
 const MAX_HISTORY = 200;
 
+/* ── Semáforo de temperatura (igual a electroSim) ── */
+export const TEMP_COLORS = {
+  ok:     '#4CAF50',   // verde    < 40 °C
+  warn:   '#FFC107',   // amarillo 40–60 °C
+  danger: '#F44336',   // rojo     > 60 °C
+};
+
+/** Nivel del semáforo: 'ok' | 'warn' | 'danger'. Única fuente de umbrales. */
+export function tempLevel(t) {
+  if (t < 40) return 'ok';
+  if (t <= 60) return 'warn';
+  return 'danger';
+}
+
 /**
  * Apply global Chart.js defaults for monochrome theme.
  */
@@ -149,7 +163,7 @@ export class ImuChart {
 }
 
 /* ──────────────────────────────────────────────────────────────
-   Temperature Bar Chart — monochrome bars
+   Temperature Bar Chart — barras con colores del semáforo
    ────────────────────────────────────────────────────────────── */
 
 export class TempChart {
@@ -204,17 +218,13 @@ export class TempChart {
   }
 
   /**
-   * Update with monochrome intensity based on temperature.
+   * Update bars, colored by the temperature semaphore.
    * @param {Array<{nombre: string, temperatura: number}>} motors
    */
   update(motors) {
     const labels = motors.map(m => m.nombre);
     const data = motors.map(m => m.temperatura);
-    const colors = data.map(t =>
-      t > 60 ? MONO.black :
-      t > 40 ? MONO.gray500 :
-               MONO.gray300
-    );
+    const colors = data.map(t => TEMP_COLORS[tempLevel(t)]);
 
     this.chart.data.labels = labels;
     this.chart.data.datasets[0].data = data;

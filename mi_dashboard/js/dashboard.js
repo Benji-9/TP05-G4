@@ -7,7 +7,7 @@
  */
 
 import { TelemetrySocket } from './websocket.js';
-import { applyChartDefaults, ImuChart, TempChart } from './charts.js';
+import { applyChartDefaults, ImuChart, TempChart, tempLevel } from './charts.js';
 import { SampleCapture } from './csv-export.js';
 
 /* ══════════════════════════════════════════════════════════════
@@ -332,9 +332,7 @@ function updateMotorTable(allMotors) {
 }
 
 function tempClass(t) {
-  if (t > 60) return 'temp-dot--danger';
-  if (t > 40) return 'temp-dot--warn';
-  return 'temp-dot--ok';
+  return `temp-dot--${tempLevel(t)}`;
 }
 
 function updateTempChart(allMotors) {

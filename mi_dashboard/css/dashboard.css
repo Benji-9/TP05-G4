@@ -348,30 +348,18 @@ body {
   gap: var(--space-sm);
 }
 
+/* Semáforo: mismos colores que TEMP_COLORS en charts.js */
 .temp-dot {
-  width: 6px;
-  height: 6px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   flex-shrink: 0;
-  transition: all 0.3s;
+  transition: background 0.3s;
 }
 
-.temp-dot--ok {
-  background: transparent;
-  border: 1.5px solid var(--gray-300);
-}
-
-.temp-dot--warn {
-  background: var(--gray-500);
-  border: 1.5px solid var(--gray-500);
-}
-
-.temp-dot--danger {
-  background: var(--black);
-  border: 1.5px solid var(--black);
-  width: 7px;
-  height: 7px;
-}
+.temp-dot--ok     { background: #4CAF50; }
+.temp-dot--warn   { background: #FFC107; }
+.temp-dot--danger { background: #F44336; }
 
 /* ── IMU Panel ── */
 .imu-values {
