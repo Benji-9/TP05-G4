@@ -7,7 +7,7 @@
  */
 
 import { TelemetrySocket } from './websocket.js';
-import { applyChartDefaults, ImuChart, TempChart, TempHistoryChart, tempLevel } from './charts.js';
+import { applyChartDefaults, ImuChart, TempHistoryChart, tempLevel } from './charts.js';
 import { SampleCapture } from './csv-export.js';
 
 /* ══════════════════════════════════════════════════════════════
@@ -48,8 +48,6 @@ let state = {
 let socket = null;
 /** @type {ImuChart} */
 let imuChart = null;
-/** @type {TempChart} */
-let tempChart = null;
 /** @type {TempHistoryChart} */
 let tempHistory = null;
 /** @type {SampleCapture} */
@@ -180,10 +178,6 @@ function buildUI(info) {
   const imuCanvas = $('#imu-chart');
   if (imuChart) imuChart.destroy();
   imuChart = new ImuChart(imuCanvas);
-
-  const tempCanvas = $('#temp-chart');
-  if (tempChart) tempChart.destroy();
-  tempChart = new TempChart(tempCanvas);
 
   if (tempHistory) tempHistory.destroy();
   tempHistory = new TempHistoryChart($('#temp-history-chart'));
@@ -375,10 +369,7 @@ function tempClass(t) {
 }
 
 function updateTempChart(allMotors) {
-  if (!tempChart) return;
-  const motors = getActiveMotors(allMotors);
-  tempChart.update(motors);
-  tempHistory?.show(motors);
+  tempHistory?.show(getActiveMotors(allMotors));
 }
 
 /* ── IMU ── */

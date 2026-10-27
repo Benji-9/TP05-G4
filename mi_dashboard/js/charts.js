@@ -183,11 +183,16 @@ export class TempHistoryChart {
         scales: {
           x: { display: false },
           y: {
-            suggestedMin: 20,
-            suggestedMax: 80,
-            grid: { color: MONO.gray100, drawTicks: false },
+            // Eje ajustado a los datos; 40 y 60 °C marcados con el semáforo
+            grace: '10%',
+            grid: {
+              color: (ctx) => ctx.tick?.value === 60 ? TEMP_COLORS.danger
+                : ctx.tick?.value === 40 ? TEMP_COLORS.warn
+                : MONO.gray100,
+              drawTicks: false,
+            },
             border: { color: MONO.gray200 },
-            ticks: { maxTicksLimit: 5, padding: 8 },
+            ticks: { stepSize: 5, padding: 8 },
           },
         },
         plugins: { legend: { position: 'top', align: 'start' } },
@@ -226,81 +231,6 @@ export class TempHistoryChart {
         fill: false,
       }));
     }
-    this.chart.update('none');
-  }
-
-  destroy() {
-    this.chart.destroy();
-  }
-}
-
-/* ──────────────────────────────────────────────────────────────
-   Temperature Bar Chart — barras con colores del semáforo
-   ────────────────────────────────────────────────────────────── */
-
-export class TempChart {
-  /**
-   * @param {HTMLCanvasElement} canvas
-   */
-  constructor(canvas) {
-    this.chart = new Chart(canvas, {
-      type: 'bar',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Temp °C',
-          data: [],
-          backgroundColor: [],
-          borderRadius: 1,
-          barThickness: 12,
-        }],
-      },
-      options: {
-        indexAxis: 'y',
-        scales: {
-          x: {
-            beginAtZero: true,
-            max: 80,
-            grid: {
-              color: MONO.gray100,
-              drawTicks: false,
-            },
-            border: {
-              color: MONO.gray200,
-            },
-            ticks: {
-              maxTicksLimit: 5,
-              padding: 8,
-            },
-          },
-          y: {
-            grid: { display: false },
-            border: { display: false },
-            ticks: {
-              font: { size: 9 },
-              padding: 4,
-            },
-          },
-        },
-        plugins: {
-          legend: { display: false },
-        },
-      },
-    });
-  }
-
-  /**
-   * Update bars, colored by the temperature semaphore.
-   * @param {Array<{nombre: string, temperatura: number}>} motors
-   */
-  update(motors) {
-    const labels = motors.map(m => m.nombre);
-    const data = motors.map(m => m.temperatura);
-    const colors = data.map(t => TEMP_COLORS[tempLevel(t)]);
-
-    this.chart.data.labels = labels;
-    this.chart.data.datasets[0].data = data;
-    this.chart.data.datasets[0].backgroundColor = colors;
     this.chart.update('none');
   }
 
