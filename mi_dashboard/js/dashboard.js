@@ -240,6 +240,13 @@ function connectSocket() {
     const label = $('#connection-label');
 
     dot.className = 'connection__dot';
+
+    // Aviso en los paneles mientras no haya datos vigentes
+    document.body.classList.toggle('is-offline', status !== 'connected');
+    $('#offline-banner').textContent = status === 'connecting'
+      ? 'Conectando con el backend…'
+      : 'Sin conexión con el backend — se muestra el último dato recibido';
+
     switch (status) {
       case 'connected':
         dot.classList.add('connection__dot--connected');

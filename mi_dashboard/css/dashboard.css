@@ -220,6 +220,19 @@ body {
 }
 
 /* ── Dashboard Grid ── */
+/* Sin conexión: banner + paneles atenuados (se ve el último dato, no vigente) */
+.offline-banner {
+  display: none;
+  padding: var(--space-sm) var(--space-xl);
+  background: var(--bg-inverse);
+  color: var(--text-inverse);
+  font-size: 12px;
+  text-align: center;
+}
+
+body.is-offline .offline-banner { display: block; }
+body.is-offline .dashboard-grid { opacity: 0.4; transition: opacity 0.3s; }
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
