@@ -13,7 +13,9 @@ y la visualiza en vivo: motores, IMU, batería (BMS) y fuerzas por pata.
 
 ### 1. Requisitos
 Seguir `TP05_Desarrollo_de_Aplicaciones_II/INSTALACION.md` (Python 3.10+ y
-`pip install mujoco`, `fastapi`, `uvicorn`).
+`pip install mujoco fastapi "uvicorn[standard]"`). **Importante:** si instalás
+`uvicorn` a secas, falta la librería `websockets` y el dashboard queda sin datos
+(`/ws` responde 404); `pip install -r requirements.txt` ya lo resuelve.
 
 ### 2. Levantar todo (Windows, un solo paso)
 

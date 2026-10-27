@@ -21,13 +21,15 @@ if not defined PYTHON (
   exit /b 1
 )
 
-REM ── Dependencias (mujoco, fastapi, uvicorn) ──
-%PYTHON% -c "import mujoco, fastapi, uvicorn" >nul 2>&1
+REM ── Dependencias (mujoco, fastapi, uvicorn, websockets) ──
+REM    websockets: sin esta libreria uvicorn rechaza /ws con 404 y el
+REM    dashboard queda sin datos.
+%PYTHON% -c "import mujoco, fastapi, uvicorn, websockets" >nul 2>&1
 if errorlevel 1 (
   echo    Faltan dependencias, instalando por primera vez...
   echo.
   call "%~dp0instalar_dependencias.bat"
-  %PYTHON% -c "import mujoco, fastapi, uvicorn" >nul 2>&1
+  %PYTHON% -c "import mujoco, fastapi, uvicorn, websockets" >nul 2>&1
   if errorlevel 1 (
     echo.
     echo    ERROR: no se pudieron instalar las dependencias.
