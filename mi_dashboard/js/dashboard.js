@@ -60,6 +60,11 @@ let sampler = null;
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
+/** Escapa texto del backend antes de interpolarlo en innerHTML. */
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+}[c]));
+
 /* ══════════════════════════════════════════════════════════════
    Initialization
    ══════════════════════════════════════════════════════════════ */
@@ -213,8 +218,8 @@ function buildForcesDiagram(info) {
       <div class="forces-feet">
         ${patas.map(p => `
           <div class="forces-foot">
-            <div class="forces-foot__indicator" id="force-${p}"></div>
-            <span class="forces-foot__label">${p.replace('_', ' ')}</span>
+            <div class="forces-foot__indicator" id="force-${esc(p)}"></div>
+            <span class="forces-foot__label">${esc(p.replace('_', ' '))}</span>
           </div>
         `).join('')}
       </div>
@@ -222,9 +227,9 @@ function buildForcesDiagram(info) {
   } else {
     container.className = 'forces-diagram forces-diagram--quadruped';
     container.innerHTML = patas.map(p => `
-      <div class="forces-paw" id="force-${p}">
+      <div class="forces-paw" id="force-${esc(p)}">
         <div class="forces-paw__dot"></div>
-        <span class="forces-paw__label">${p}</span>
+        <span class="forces-paw__label">${esc(p)}</span>
       </div>
     `).join('');
   }
@@ -307,7 +312,7 @@ function updateMotorTable(allMotors) {
     tbody.dataset.groupId = state.activeTab;
     tbody.innerHTML = motors.map(m => `
       <tr id="motor-row-${m.id}">
-        <td class="motor-name">${m.nombre}</td>
+        <td class="motor-name">${esc(m.nombre)}</td>
         <td class="motor-value" data-field="angulo">${m.angulo.toFixed(1)}°</td>
         <td class="motor-value" data-field="velocidad">${m.velocidad.toFixed(2)}</td>
         <td class="motor-value" data-field="torque">${m.torque.toFixed(2)}</td>
