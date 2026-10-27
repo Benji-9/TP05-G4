@@ -22,7 +22,7 @@ Simulador / robot ──► backend FastAPI (:8001) ──► navegador (dashboa
 |---|---|
 | `dashboard.js` | Orquestador: pide `/info`, arma la UI según el robot, recibe cada frame y actualiza un panel con una función por panel (`updateMotorTable`, `updateIMU`, `updateBMS`, `updateForces`). |
 | `websocket.js` | `TelemetrySocket`: conexión WebSocket con reconexión automática (backoff 1 s → 10 s) y callbacks `onTelemetry` / `onStatus`. |
-| `charts.js` | Gráficos con Chart.js: `ImuChart`, `TempHistoryChart`, `TempChart` (barras), y `tempLevel()` / `TEMP_COLORS`, la única definición del semáforo. |
+| `charts.js` | Gráficos con Chart.js: `ImuChart`, `TempHistoryChart`, y `tempLevel()` / `TEMP_COLORS`, la única definición del semáforo. |
 | `csv-export.js` | `SampleCapture`: guarda copias de los frames y genera el CSV en el navegador. |
 | `vendor/chart.umd.min.js` | Chart.js 4.4.7 (MIT), copia local para funcionar sin internet. |
 
@@ -34,7 +34,7 @@ Simulador / robot ──► backend FastAPI (:8001) ──► navegador (dashboa
 
 ## 3. Decisiones de diseño por panel
 
-- **Motores.** Tabla por grupo (G1: piernas/torso/brazos; Go2: una pata por pestaña) para que 29 motores sean legibles. Semáforo de temperatura como en electroSim: verde `< 40 °C`, amarillo `40–60 °C`, rojo `> 60 °C`, calculado por una sola función (`tempLevel`) que usan la tabla y el gráfico de barras. Además, un gráfico de líneas con la temperatura de cada motor del grupo activo. Se guarda el historial de *todos* los motores, para no perder datos al cambiar de pestaña.
+- **Motores.** Tabla por grupo (G1: piernas/torso/brazos; Go2: una pata por pestaña) para que 29 motores sean legibles. Semáforo de temperatura como en electroSim: verde `< 40 °C`, amarillo `40–60 °C`, rojo `> 60 °C`, calculado por una sola función (`tempLevel`) y mostrado en la celda de temperatura de cada fila. Además, un gráfico de líneas con la temperatura de cada motor del grupo activo, con el eje ajustado a los datos y las líneas de 40 °C (amarillo) y 60 °C (rojo) como referencia. Se guarda el historial de *todos* los motores, para no perder datos al cambiar de pestaña.
 - **IMU.** Roll, pitch y yaw numéricos más aceleraciones, y un gráfico de línea histórico.
 - **BMS.** Carga (%) en un indicador circular, corriente en mA, temperatura y voltajes de celda (se muestran solo si el backend los envía).
 - **Fuerzas.** Un diagrama por tipo de robot: cuatro patas (FR, FL, RR, RL) para el Go2 y dos pies para el G1; cada indicador marca apoyado / en el aire.
