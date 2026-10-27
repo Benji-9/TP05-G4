@@ -822,6 +822,10 @@ body {
   margin-top: var(--space-lg);
 }
 
+.temp-history {
+  margin-top: var(--space-lg);
+}
+
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .dashboard-grid {

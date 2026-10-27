@@ -7,7 +7,7 @@
  */
 
 import { TelemetrySocket } from './websocket.js';
-import { applyChartDefaults, ImuChart, TempChart, tempLevel } from './charts.js';
+import { applyChartDefaults, ImuChart, TempChart, TempHistoryChart, tempLevel } from './charts.js';
 import { SampleCapture } from './csv-export.js';
 
 /* ══════════════════════════════════════════════════════════════
@@ -48,6 +48,8 @@ let socket = null;
 let imuChart = null;
 /** @type {TempChart} */
 let tempChart = null;
+/** @type {TempHistoryChart} */
+let tempHistory = null;
 /** @type {SampleCapture} */
 let sampler = null;
 
@@ -167,6 +169,9 @@ function buildUI(info) {
   if (tempChart) tempChart.destroy();
   tempChart = new TempChart(tempCanvas);
 
+  if (tempHistory) tempHistory.destroy();
+  tempHistory = new TempHistoryChart($('#temp-history-chart'));
+
   // Forces diagram
   buildForcesDiagram(info);
 
@@ -270,6 +275,7 @@ function onTelemetryFrame(data) {
   state.frameCount++;
 
   updateMotorTable(data.motores);
+  tempHistory?.push(data.ts, data.motores);
   updateTempChart(data.motores);
   updateIMU(data.imu, data.ts);
   updateBMS(data.bms);
@@ -339,6 +345,7 @@ function updateTempChart(allMotors) {
   if (!tempChart) return;
   const motors = getActiveMotors(allMotors);
   tempChart.update(motors);
+  tempHistory?.show(motors);
 }
 
 /* ── IMU ── */
