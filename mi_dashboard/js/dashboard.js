@@ -40,6 +40,8 @@ let state = {
   frameCount: 0,
   fpsTimer: null,
   fps: 0,
+  infoPending: false,
+  infoRetryAt: 0,
 };
 
 /** @type {TelemetrySocket} */
@@ -122,19 +124,28 @@ async function fetchRobotInfo() {
     if (!res.ok) throw new Error(res.statusText);
     state.robotInfo = await res.json();
   } catch (err) {
-    console.warn('[Dashboard] Could not fetch /info, using defaults:', err.message);
-    state.robotInfo = {
-      modelo: 'g1',
-      nombre: 'Unitree G1',
-      tipo: 'humanoide',
-      n_motores: 29,
-      motores_nombres: [],
-      patas: ['R_foot', 'L_foot'],
-      modo: 'desconocido',
-    };
+    // No se inventa un modelo: sin /info los frames se descartan y se reintenta.
+    console.warn('[Dashboard] No se pudo leer /info:', err.message);
+    state.robotInfo = null;
+    $('#robot-name').textContent = 'Sin datos del robot';
+    $('#robot-mode').textContent = '/info no disponible';
+    return;
   }
 
   buildUI(state.robotInfo);
+}
+
+/** Reintenta /info sin solaparse; como mucho una vez cada 2 s. */
+async function refreshInfo() {
+  const now = Date.now();
+  if (state.infoPending || now < state.infoRetryAt) return;
+  state.infoPending = true;
+  state.infoRetryAt = now + 2000;
+  try {
+    await fetchRobotInfo();
+  } finally {
+    state.infoPending = false;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -283,6 +294,12 @@ function connectSocket() {
    ══════════════════════════════════════════════════════════════ */
 
 function onTelemetryFrame(data) {
+  // La UI se arma con /info: si falta, o el robot cambió, se vuelve a pedir.
+  if (!state.robotInfo || data.modelo !== state.robotInfo.modelo) {
+    refreshInfo();
+    return;
+  }
+
   state.lastData = data;
   state.frameCount++;
 
