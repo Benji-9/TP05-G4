@@ -163,6 +163,78 @@ export class ImuChart {
 }
 
 /* ──────────────────────────────────────────────────────────────
+   Temperature History — una línea por motor del grupo activo
+   ────────────────────────────────────────────────────────────── */
+
+export class TempHistoryChart {
+  /**
+   * @param {HTMLCanvasElement} canvas
+   */
+  constructor(canvas) {
+    this._labels = [];
+    /** @type {Map<string, number[]>} nombre de motor → búfer circular */
+    this._hist = new Map();
+
+    this.chart = new Chart(canvas, {
+      type: 'line',
+      data: { labels: this._labels, datasets: [] },
+      options: {
+        elements: { point: { radius: 0 }, line: { borderWidth: 1.5, tension: 0.3 } },
+        scales: {
+          x: { display: false },
+          y: {
+            suggestedMin: 20,
+            suggestedMax: 80,
+            grid: { color: MONO.gray100, drawTicks: false },
+            border: { color: MONO.gray200 },
+            ticks: { maxTicksLimit: 5, padding: 8 },
+          },
+        },
+        plugins: { legend: { position: 'top', align: 'start' } },
+        interaction: { intersect: false, mode: 'index' },
+      },
+    });
+  }
+
+  /**
+   * Agrega una muestra de TODOS los motores (así el historial no se corta
+   * al cambiar de pestaña). Búfer circular de MAX_HISTORY.
+   */
+  push(ts, allMotors) {
+    this._labels.push(ts.toFixed(1));
+    if (this._labels.length > MAX_HISTORY) this._labels.shift();
+
+    for (const m of allMotors) {
+      let buf = this._hist.get(m.nombre);
+      if (!buf) this._hist.set(m.nombre, buf = []);
+      buf.push(m.temperatura);
+      if (buf.length > MAX_HISTORY) buf.shift();
+    }
+  }
+
+  /** Muestra las curvas de los motores dados, sin recrear el chart. */
+  show(activeMotors) {
+    const names = activeMotors.map(m => m.nombre);
+    const ds = this.chart.data.datasets;
+    if (ds.length !== names.length || ds.some((d, i) => d.label !== names[i])) {
+      ds.length = 0;
+      names.forEach((name, i) => ds.push({
+        label: name,
+        data: this._hist.get(name) || [],
+        borderColor: `hsl(${(i * 47) % 360} 55% 42%)`,
+        backgroundColor: 'transparent',
+        fill: false,
+      }));
+    }
+    this.chart.update('none');
+  }
+
+  destroy() {
+    this.chart.destroy();
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
    Temperature Bar Chart — barras con colores del semáforo
    ────────────────────────────────────────────────────────────── */
 
